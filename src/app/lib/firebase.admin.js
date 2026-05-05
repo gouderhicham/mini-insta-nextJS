@@ -1,0 +1,16 @@
+import admin from "firebase-admin";
+
+const serviceAccount = {
+  projectId: "refresh-619",
+  clientEmail:"firebase-adminsdk-fbsvc@refresh-619.iam.gserviceaccount.com",
+  privateKey:"-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDCQRbhm1zZbIbL\nr/Bb56nZth6VVZV4b2Y3JIEORzNK7nRgYuHxX9Cs971bj52HDvLuRE4jdpIyDfwR\nkF3T6SDfzqADJl821vdpzoOhflhWpwAdzJ7UoB+eZORHk1+DSPZSgxGSqmpOXv3b\nvyiMD8OkgKiPKoVZQyihBamy5NKATQjHHXKfUP9ZS6wMgDV+qI2rDnsYjlB/hTaF\nLDfdcRqFdv1hZirSt3qQzFiYRTjcCO2U3meHzAY1oU7SOCFVqNLQXl54ddVS9Xtj\nXeqQ3owcJ7eTAQhryE7W2zsBjWZt7ibshIrRXmfGc35r9iASVCiqoU8c+R5RBxfE\n+VS494pVAgMBAAECggEAL8IR7pCkYL4qW8ybMvU/UIvSdBORBoWY40jBw/FkXnFG\nwmW9N/s/Ei9saiTibVCTEFpRva1KnyzKAsV0FAP2dZ/Wvj+CXDi4plZEDYHDFTbE\ntA7ZI9xkOayDZUeJzXy0NrALs3vbW/5Fum+CeADuMDUDfANPupTk2cXLJXTVff5D\n6dL0bEealisUlZLRf16XAkdSuPv1Y+0+i65b3rguWPiqw4+VXrXyevjOX00ij9P4\nE/n4+pB+KSmrQ4IMtCA0r1YFVyAp/5pbTfyjugqOTQMOwUWMTj8Ig71Bz8mcaLSw\nbitXu2XwHeHiJpMXmI3vIpyXKU3WD8yjmzCPxXzBQQKBgQD+HrNrmf9vK3/tSW9w\nJ417o1nU1okh+lOv3Pr+lCwBtrErg/3aGGTvBeYJNQbC0FiUeEDqum3bUXJS2exI\nwS+kAmkOGh/tMiL2+WwYL6zBdKxdpHQTG6Lst9coqXcpAay+x6gYFknOCyi0wrGP\nqGYdkSAxhcksw5UplqmD1b3MtQKBgQDDsQD+dhHEEtrJkEWvh9VvGxN+mpIa2C8M\nQTzaan/b0W8M1KO7DjUiAYRcfmmv94zKpnwnk62MvqyK5/M/5AkP7MtNcVaAJqng\nYLLSQ/zCT9IKnsdWqfL9TDa5AvFaJtyiGUg8YY4jQWnA5Du8R22PShhYCY0bTgYV\nC98Kof7rIQKBgQCalJ5b5A+n1nQ5KaSqOsUr4pAwklhU3OuvXOMpnYSvfiyD5gSz\neIddht8J1sHIG+jmV8hVgRZ2hTLgB0RedXW/dN/m/ilRpl/ykIMaq1WRUKHRTMp3\nHSacjLBLQdsEjMpCOz2beWNn/Q3D93L/ilajwbYtqc5Ydpjz9XwkgA62yQKBgAXr\n0irg6bK0G1ij++fOxV+CQzm+dZNIXUwSoUO+mzXMhX6u5HFhgawQva+Kx6niZKkx\nFmqgJk0u68ucLxkMzlVkBdbHCiYAhX1bj62bDwfWIHXfzgpKRCbz6mf4tdLTgDOL\nbksdbI6WiRukDEarJp6CUHBBgbqExtxWKp6IvkzhAoGBAPzGUfuvW+ywCnYv3OCn\nQVhMH48hzAM7witHEPiBjb/S0PxAzs0J97V5G8J+I9NfJ9BF372OtjlOPEOT/Cgc\nsVYKnGQF8wx6d7qsWasX2kEZ5vFh/JEnuMX7cux5M5+IGVFnQ1NtN/mxakWBJJ+R\n9SreArsOUegaX9u1crD7CWnL\n-----END PRIVATE KEY-----\n",
+};
+
+
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+}
+
+export const db = admin.firestore();
