@@ -15,25 +15,10 @@
   --glass-border: rgba(255, 255, 255, 0.08);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --background: #f8fafc;
-    --foreground: #0f172a;
-    --primary: #FF0F47;
-    --primary-hover: #d10837;
-    --secondary: #ffffff;
-    --secondary-hover: #f1f5f9;
-    --accent: #FFDB8A;
-    --border: #e2e8f0;
-    --input-bg: #ffffff;
-    --input-border: #cbd5e1;
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(0, 0, 0, 0.08);
-  }
-}
 
 html {
   height: 100%;
+  color-scheme: dark;
 }
 
 html,
@@ -83,8 +68,3 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-}
