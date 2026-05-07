@@ -17,22 +17,22 @@ const geistMono = Geist_Mono({
 // --- SEO & METADATA CONFIGURATION ---
 export const metadata = {
   title: {
-    default: "Your Brand Name",
-    template: "%s | Your Brand Name",
+    default: "Mini Instagram | Gouder hicham ",
+    template: "%s | Gouder hicham ",
   },
-  description: "A concise, keyword-rich description of your app (150-160 characters).",
-  keywords: ["Next.js", "React", "Web Development", "Your Specific Niche"],
+  description: "Gouder hicham website , a mini social media website with instagram features ",
+  keywords: ["Next.js", "React", "Web Development", "Gouder Hicham"],
   authors: [{ name: "Gouder Hicham" }],
   creator: "Gouder Hicham",
-  metadataBase: new URL("https://your-domain.com"),
+  metadataBase: new URL("https://mini-insta-next-js.vercel.app/"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Your Brand Name",
+    title: "Gouder Hicham",
     description: "Catchy description for social media shares.",
-    url: "https://your-domain.com",
-    siteName: "Your Brand Name",
+    url: "https://mini-insta-next-js.vercel.app/",
+    siteName: "Gouder hicham",
     images: [
       {
         url: "/og-image.png",
