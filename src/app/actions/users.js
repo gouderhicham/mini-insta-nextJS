@@ -40,3 +40,30 @@ export async function updateUserProfile(uid, data) {
     return { error: "Failed to update user." };
   }
 }
+
+export async function searchUsers(query) {
+  try {
+    if (!query) return { users: [] };
+    
+    const snapshot = await db.collection("users").limit(100).get();
+    const allUsers = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : new Date().toISOString()
+      };
+    });
+    
+    const lowerQuery = query.toLowerCase();
+    const filteredUsers = allUsers.filter(u => 
+      (u.fullName && u.fullName.toLowerCase().includes(lowerQuery)) ||
+      (u.username && u.username.toLowerCase().includes(lowerQuery))
+    ).slice(0, 10);
+    
+    return { users: filteredUsers };
+  } catch (error) {
+    console.error("Error searching users:", error);
+    return { error: "Failed to search users." };
+  }
+}

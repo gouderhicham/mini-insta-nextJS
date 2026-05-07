@@ -8,6 +8,7 @@ import Link from "next/link";
 import styles from "./UserProfile.module.css";
 import CreatePost from "./CreatePost";
 import PostItem from "./PostItem";
+import { formatTimeAgo } from "../lib/formatDate";
 
 export default function UserProfileClient({ userProfile, userPosts, isOwner, currentUser, initialIsFollowing }) {
   const router = useRouter();
@@ -270,7 +271,7 @@ export default function UserProfileClient({ userProfile, userPosts, isOwner, cur
                   <p className={styles.bio}>{userProfile.bio}</p>
                 )}
                 <div className={styles.joinDate}>
-                  Joined {new Date(userProfile.createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
+                  Joined {formatTimeAgo(userProfile.createdAt)}
                 </div>
               </>
             )}

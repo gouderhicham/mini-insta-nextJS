@@ -1,11 +1,11 @@
 :root {
   --background: #0f1115;
   --foreground: #f1f3f5;
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
+  --primary: #FF0F47;
+  --primary-hover: #d10837;
   --secondary: #1e2128;
   --secondary-hover: #2a2e37;
-  --accent: #ec4899;
+  --accent: #FFDB8A;
   --border: #2a2e37;
   --input-bg: #15181e;
   --input-border: #2a2e37;
@@ -19,11 +19,11 @@
   :root {
     --background: #f8fafc;
     --foreground: #0f172a;
-    --primary: #4f46e5;
-    --primary-hover: #4338ca;
+    --primary: #FF0F47;
+    --primary-hover: #d10837;
     --secondary: #ffffff;
     --secondary-hover: #f1f5f9;
-    --accent: #db2777;
+    --accent: #FFDB8A;
     --border: #e2e8f0;
     --input-bg: #ffffff;
     --input-border: #cbd5e1;

@@ -5,6 +5,7 @@ import { setPostLikeStatus, addComment, getComments, setCommentLikeStatus } from
 import { updatePost, deletePost } from "../actions/posts";
 import styles from "./PostItem.module.css";
 import Link from "next/link";
+import { formatTimeAgo } from "../lib/formatDate";
 
 export default function PostItem({ post, currentUser }) {
   const [isLiked, setIsLiked] = useState(post.isLikedByMe || false);
@@ -133,7 +134,7 @@ export default function PostItem({ post, currentUser }) {
           <div>
             <h3 className={styles.postAuthorName}>{post.authorName || "Unknown User"}</h3>
             <p className={styles.postDate}>
-              {new Date(post.createdAt).toLocaleDateString()}
+              {formatTimeAgo(post.createdAt)}
             </p>
           </div>
           </Link>
@@ -221,7 +222,7 @@ export default function PostItem({ post, currentUser }) {
                       <div className={styles.commentText}>{comment.text}</div>
                     </div>
                     <div className={styles.commentMeta}>
-                      <span>{new Date(comment.createdAt).toLocaleDateString()}</span>
+                      <span>{formatTimeAgo(comment.createdAt)}</span>
                       <button 
                         onClick={() => handleCommentLike(comment.id, comment.isLikedByMe)}
                         className={`${styles.commentLikeBtn} ${comment.isLikedByMe ? styles.liked : ''}`}
