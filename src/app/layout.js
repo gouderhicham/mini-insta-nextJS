@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import { auth } from "../auth";
+import { getUserProfile } from "./actions/users";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,11 +58,27 @@ export const metadata = {
 
 export default async function RootLayout({ children }) {
   const session = await auth();
+  
+  // Fetch latest user info from Firestore so Navbar gets the newest profile picture
+  let latestSession = session;
+  if (session?.user?.id) {
+    const { user } = await getUserProfile(session.user.id);
+    if (user) {
+      latestSession = {
+        ...session,
+        user: {
+          ...session.user,
+          name: user.fullName || user.username || session.user.name,
+          image: user.profilePic || session.user.image,
+        }
+      };
+    }
+  }
 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
       <body suppressHydrationWarning className="min-h-screen bg-background font-sans">
-        <Navbar session={session} />
+        <Navbar session={latestSession} />
         {children}
       </body>
     </html>
