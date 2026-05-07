@@ -17,6 +17,8 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1rem;
+  border-bottom: 0.1px solid #2f2f2f;
+  padding-bottom: 1rem;
 }
 
 .postHeader {
@@ -200,6 +202,16 @@
 
 .actionBtn:hover {
   opacity: 0.8;
+}
+
+.shareBtn {
+  margin-left: auto;
+}
+
+.actionIcon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
 .commentsSection {

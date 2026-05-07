@@ -12,6 +12,7 @@ export default function Navbar({ session }) {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -37,21 +38,46 @@ export default function Navbar({ session }) {
 
   return (
     <nav className={styles.navbar}>
-      <div className={styles.container}>
-        <Link href="/" className={styles.logo}>
-          <Image src="/Logo.svg" alt="miniNSTA Logo" width={32} height={32} className={styles.logoImage} />
-          <span className={styles.logoText}>miniNSTA</span>
+      <Link href="/" className={styles.logo}>
+        <Image src="/Logo.svg" alt="miniNSTA Logo" width={32} height={32} className={styles.logoImage} />
+        <span className={styles.logoText}>miniNSTA</span>
+      </Link>
+      
+      <div className={styles.navLinks}>
+        {/* Feed */}
+        <Link href="/" className={styles.navItem}>
+          <Image src="/Feed-icon.svg" alt="Feed" width={24} height={24} className={styles.icon} />
+          <span className={styles.navText}>Feed</span>
         </Link>
+        
+        {/* Search */}
         <div className={styles.searchContainer}>
-          <input 
-            type="text" 
-            placeholder="Search users..." 
-            className={styles.searchInput}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => searchQuery.trim() && setShowResults(true)}
-            onBlur={() => setTimeout(() => setShowResults(false), 200)}
-          />
+          {/* Desktop Search */}
+          <div className={`${styles.searchItem} ${styles.desktopSearch}`}>
+            <div className={styles.searchIconWrapper}>
+              <Image src="/search-icon.svg" alt="Search" width={20} height={20} className={styles.icon} />
+            </div>
+            <input 
+              type="text" 
+              placeholder="Search users..." 
+              className={styles.searchInput}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => searchQuery.trim() && setShowResults(true)}
+              onBlur={() => setTimeout(() => setShowResults(false), 200)}
+            />
+          </div>
+          
+          {/* Mobile Search Button */}
+          <button 
+            className={`${styles.navItem} ${styles.mobileSearchBtn}`}
+            onClick={() => setShowMobileSearch(!showMobileSearch)}
+          >
+            <Image src="/search-icon.svg" alt="Search" width={24} height={24} className={styles.icon} />
+            <span className={styles.navText}>Search</span>
+          </button>
+
+          {/* Search Results Dropdown */}
           {showResults && (
             <div className={styles.searchResults}>
               {isSearching ? (
@@ -78,28 +104,35 @@ export default function Navbar({ session }) {
             </div>
           )}
         </div>
-        <div className={styles.navLinks}>
-          <button 
-            onClick={() => signOut()} 
-            className={styles.signOutButton}
-          >
-            Sign Out
-          </button>
-          <Link href={`/profile/${session.user.id}`} className={styles.profileLink}>
-            <div className={styles.avatar}>
-              {session.user.image ? (
-                <img src={session.user.image} alt="Profile" className={styles.avatarImage} />
-              ) : (
-                <span className={styles.avatarInitial}>
-                  {session.user.name ? session.user.name.charAt(0).toUpperCase() : "U"}
-                </span>
-              )}
-            </div>
-            <span className={styles.userName}>{session.user.name || "Profile"}</span>
-          </Link>
-          
-        </div>
+
+        {/* Profile */}
+        <Link href={`/profile/${session.user.id}`} className={styles.navItem}>
+          <Image src="/my-profile-icon.svg" alt="Profile" width={24} height={24} className={styles.icon} />
+          <span className={styles.navText}>Profile</span>
+        </Link>
+        
+        {/* Log Out */}
+        <button onClick={() => signOut()} className={styles.navItem}>
+          <Image src="/log-out-icon.svg" alt="Log out" width={24} height={24} className={styles.icon} />
+          <span className={styles.navText}>Log out</span>
+        </button>
       </div>
+
+      {/* Mobile Search Input Overlay */}
+      {showMobileSearch && (
+        <div className={styles.mobileSearchOverlay}>
+           <input 
+              type="text" 
+              placeholder="Search users..." 
+              className={styles.mobileSearchInput}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => searchQuery.trim() && setShowResults(true)}
+              onBlur={() => setTimeout(() => setShowResults(false), 200)}
+              autoFocus
+            />
+        </div>
+      )}
     </nav>
   );
 }

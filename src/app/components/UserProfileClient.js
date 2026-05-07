@@ -266,7 +266,6 @@ export default function UserProfileClient({ userProfile, userPosts, isOwner, cur
                     <span className={styles.statLabel}>Following</span>
                   </div>
                 </div>
-                
                 {userProfile.bio && (
                   <p className={styles.bio}>{userProfile.bio}</p>
                 )}
@@ -277,10 +276,9 @@ export default function UserProfileClient({ userProfile, userPosts, isOwner, cur
             )}
           </div>
         </div>
-      </div>
 
-      <div className={styles.postsSection}>
-        <h2 className={styles.sectionTitle}>Posts by {userProfile.fullName || userProfile.username}</h2>
+        <div className={styles.postsSection}>
+          <h2 className={styles.sectionTitle}>Posts by {userProfile.fullName || userProfile.username}</h2>
         
         {isOwner && currentUser && (
           <CreatePost user={currentUser} />
@@ -297,6 +295,8 @@ export default function UserProfileClient({ userProfile, userPosts, isOwner, cur
             <p>This user hasn't posted anything yet.</p>
           </div>
         )}
+      </div>
+      
       </div>
 
       {/* Social Modal */}

@@ -77,9 +77,11 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-      <body suppressHydrationWarning className="min-h-screen bg-background font-sans">
+      <body suppressHydrationWarning className="appBody">
         <Navbar session={latestSession} />
-        {children}
+        <div className="mainContent">
+          {children}
+        </div>
       </body>
     </html>
   );

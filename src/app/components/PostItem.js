@@ -5,6 +5,7 @@ import { setPostLikeStatus, addComment, getComments, setCommentLikeStatus } from
 import { updatePost, deletePost } from "../actions/posts";
 import styles from "./PostItem.module.css";
 import Link from "next/link";
+import Image from "next/image";
 import { formatTimeAgo } from "../lib/formatDate";
 
 export default function PostItem({ post, currentUser }) {
@@ -187,15 +188,19 @@ export default function PostItem({ post, currentUser }) {
         <button 
           className={styles.actionBtn} 
           onClick={handleToggleLike}
-          style={{ color: isLiked ? 'var(--accent)' : '#888' }}
         >
-          {isLiked ? '❤️' : '🤍'} {likeCount}
+          <Image src={isLiked ? "/heart-liked.svg" : "/heart-not-liked.svg"} alt="Like" width={24} height={24} className={styles.actionIcon} />
+          <span>{likeCount}</span>
         </button>
         <button 
           className={styles.actionBtn}
           onClick={toggleComments}
         >
-          💬 {commentCount}
+          <Image src="/comment-icon.svg" alt="Comment" width={24} height={24} className={styles.actionIcon} />
+          <span>{commentCount}</span>
+        </button>
+        <button className={`${styles.actionBtn} ${styles.shareBtn}`}>
+          <Image src="/share-icon.svg" alt="Share" width={24} height={24} className={styles.actionIcon} />
         </button>
       </div>
 

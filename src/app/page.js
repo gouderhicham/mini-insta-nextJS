@@ -31,7 +31,7 @@ export default async function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <h1 className={styles.title}>Your Feed</h1>
+        <h1 className={styles.title}>Feed</h1>
         
         <CreatePost user={latestUser} />
 
