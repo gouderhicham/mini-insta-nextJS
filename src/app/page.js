@@ -1,53 +1,64 @@
-"use client";
-import Link from "next/link";
+import { redirect } from "next/navigation";
+import { auth } from "../auth";
+import { getPosts } from "./actions/posts";
 import styles from "./page.module.css";
-import { db } from "./lib/firebase/firebase-client";
-import { collection, getDocs } from "firebase/firestore";
-import { useEffect, useState } from "react";
-import { useCounterStore } from "./store/zustand";
-export default function Home() {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const count = useCounterStore((s) => s.count);
-  const increase = useCounterStore((s) => s.increase);
-  const decrease = useCounterStore((s) => s.decrease);
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "posts"));
-        const postsData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setPosts(postsData);
-      } catch (error) {
-        console.error("Fetch error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPosts();
-  }, []);
-  useEffect(() => {
-    console.log("Posts updated:", posts);
-  }, [posts]);
+import Link from "next/link";
 
-  if (loading) return <p>Loading posts...</p>;
+export default async function Home() {
+  const session = await auth();
+
+  // Protect the route: must be logged in
+  if (!session) {
+    redirect("/login");
+  }
+
+  // Fetch posts server-side
+  const { posts, error } = await getPosts();
 
   return (
     <div className={styles.page}>
-      <main>
-        <h1>Counter: {count}</h1>
-        <button onClick={increase}>Increase</button>
-        <button onClick={decrease}>Decrease</button>
-        <h1>Home page</h1>
-        <Link href="/users">go to users</Link>
-        <Link href="/server-users">go to server users</Link>
-        <ul>
-          {posts.map((post) => (
-            <li key={post.id}>{post.name || "No description"}</li>
-          ))}
-        </ul>
+      <main className={styles.main}>
+        <h1 className={styles.title}>Your Feed</h1>
+        
+        {error ? (
+          <p className={styles.error}>{error}</p>
+        ) : posts && posts.length > 0 ? (
+          <div className={styles.postsList}>
+            {posts.map((post) => (
+              <div key={post.id} className={styles.postCard}>
+                <div className={styles.postHeader}>
+                  <div className={styles.postAuthorPic}>
+                    {post.authorPic ? (
+                      <img src={post.authorPic} alt={post.authorName} />
+                    ) : (
+                      <span>{post.authorName ? post.authorName.charAt(0).toUpperCase() : "U"}</span>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className={styles.postAuthor}>{post.authorName || "Unknown User"}</h3>
+                    <p className={styles.postDate}>
+                      {new Date(post.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <p className={styles.postContent}>{post.content || post.name}</p>
+                {post.imageUrl && (
+                  <img src={post.imageUrl} alt="Post image" className={styles.postImage} />
+                )}
+                <div className={styles.postActions}>
+                  <button className={styles.actionButton}>
+                    ❤️ {post.likeCount || 0}
+                  </button>
+                  <button className={styles.actionButton}>
+                    💬 {post.commentCount || 0}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className={styles.emptyState}>No posts yet. Be the first to post!</p>
+        )}
       </main>
     </div>
   );

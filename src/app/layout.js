@@ -1,5 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Navbar from "./components/Navbar";
+import { auth } from "../auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,13 +17,13 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: {
     default: "Your Brand Name",
-    template: "%s | Your Brand Name", // Allows sub-pages to have "Page Title | Your Brand Name"
+    template: "%s | Your Brand Name",
   },
   description: "A concise, keyword-rich description of your app (150-160 characters).",
   keywords: ["Next.js", "React", "Web Development", "Your Specific Niche"],
   authors: [{ name: "Gouder Hicham" }],
   creator: "Gouder Hicham",
-  metadataBase: new URL("https://your-domain.com"), // Required for OpenGraph images
+  metadataBase: new URL("https://your-domain.com"),
   alternates: {
     canonical: "/",
   },
@@ -32,7 +34,7 @@ export const metadata = {
     siteName: "Your Brand Name",
     images: [
       {
-        url: "/og-image.png", // Put this image in your /public folder
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "Brand Logo",
@@ -53,10 +55,13 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const session = await auth();
+
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
       <body suppressHydrationWarning className="min-h-screen bg-background font-sans">
+        <Navbar session={session} />
         {children}
       </body>
     </html>
