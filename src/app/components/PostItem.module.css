@@ -12,8 +12,119 @@
   border-color: var(--primary);
 }
 
-.postHeader {
+.postHeaderContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 1rem;
+}
+
+.postHeader {
+  /* margin removed, handled by container */
+}
+
+.optionsMenuContainer {
+  position: relative;
+}
+
+.optionsButton {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0.5rem;
+  line-height: 1;
+  color: var(--foreground);
+}
+
+.optionsDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.optionsDropdown button {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: var(--foreground);
+  font-size: 0.9rem;
+}
+
+.optionsDropdown button:last-child {
+  border-bottom: none;
+}
+
+.optionsDropdown button:hover {
+  background-color: var(--secondary-hover);
+}
+
+.deleteOption {
+  color: #ef4444 !important;
+}
+
+.editPostTextarea {
+  width: 100%;
+  min-height: 80px;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-family: inherit;
+  margin-bottom: 1rem;
+  resize: vertical;
+}
+
+.editPostTextarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.editPostActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.editPostBtn {
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s;
+}
+
+.editPostBtn:hover {
+  opacity: 0.8;
+}
+
+.editPostBtnPrimary {
+  background-color: var(--primary);
+  color: white;
+}
+
+.editPostBtnSecondary {
+  background-color: transparent;
+  color: var(--foreground);
+  border: 1px solid var(--border);
 }
 
 .authorLink {

@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { setPostLikeStatus, addComment, getComments, setCommentLikeStatus } from "../actions/interactions";
+import { updatePost, deletePost } from "../actions/posts";
 import styles from "./PostItem.module.css";
 import Link from "next/link";
 
@@ -13,6 +14,12 @@ export default function PostItem({ post, currentUser }) {
   const [commentCount, setCommentCount] = useState(post.commentCount || 0);
   const [newCommentText, setNewCommentText] = useState("");
   const [isLoadingComments, setIsLoadingComments] = useState(false);
+
+  const [isDeleted, setIsDeleted] = useState(false);
+  const [isEditingPost, setIsEditingPost] = useState(false);
+  const [editedContent, setEditedContent] = useState(post.content || "");
+  const [showOptions, setShowOptions] = useState(false);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   // Debounce ref for post like
   const likeTimeoutRef = useRef(null);
@@ -85,10 +92,37 @@ export default function PostItem({ post, currentUser }) {
     }, 10000); // 10 seconds debounce for comments too
   };
 
+  const handleDeletePost = async () => {
+    if (confirm("Are you sure you want to delete this post?")) {
+      const res = await deletePost(post.id, currentUser.id);
+      if (res.success) {
+        setIsDeleted(true);
+      } else {
+        alert(res.error || "Failed to delete post.");
+      }
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editedContent.trim()) return;
+    setIsSavingEdit(true);
+    const res = await updatePost(post.id, currentUser.id, editedContent.trim());
+    if (res.success) {
+      post.content = editedContent.trim();
+      setIsEditingPost(false);
+    } else {
+      alert(res.error || "Failed to update post.");
+    }
+    setIsSavingEdit(false);
+  };
+
+  if (isDeleted) return null;
+
   return (
     <div className={styles.postCard}>
-      <div className={styles.postHeader}>
-        <Link href={`/profile/${post.authorId}`} className={styles.authorLink}>
+      <div className={styles.postHeaderContainer}>
+        <div className={styles.postHeader}>
+          <Link href={`/profile/${post.authorId}`} className={styles.authorLink}>
           <div className={styles.postAuthorPic}>
             {post.authorPic ? (
               <img src={post.authorPic} alt={post.authorName} />
@@ -102,9 +136,49 @@ export default function PostItem({ post, currentUser }) {
               {new Date(post.createdAt).toLocaleDateString()}
             </p>
           </div>
-        </Link>
+          </Link>
+        </div>
+        
+        {currentUser?.id === post.authorId && (
+          <div className={styles.optionsMenuContainer}>
+            <button className={styles.optionsButton} onClick={() => setShowOptions(!showOptions)}>⋮</button>
+            {showOptions && (
+              <div className={styles.optionsDropdown}>
+                <button onClick={() => { setIsEditingPost(true); setShowOptions(false); }}>Edit Post</button>
+                <button onClick={handleDeletePost} className={styles.deleteOption}>Delete Post</button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-      <p className={styles.postContent}>{post.content}</p>
+
+      {isEditingPost ? (
+        <div className={styles.editPostContainer}>
+          <textarea
+            className={styles.editPostTextarea}
+            value={editedContent}
+            onChange={(e) => setEditedContent(e.target.value)}
+          />
+          <div className={styles.editPostActions}>
+            <button 
+              className={`${styles.editPostBtn} ${styles.editPostBtnSecondary}`}
+              onClick={() => { setIsEditingPost(false); setEditedContent(post.content); }}
+            >
+              Cancel
+            </button>
+            <button 
+              className={`${styles.editPostBtn} ${styles.editPostBtnPrimary}`}
+              onClick={handleSaveEdit}
+              disabled={isSavingEdit || !editedContent.trim()}
+            >
+              {isSavingEdit ? "Saving..." : "Save"}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <p className={styles.postContent}>{post.content}</p>
+      )}
+
       {post.imageUrl && (
         <img src={post.imageUrl} alt="Post image" className={styles.postImage} />
       )}

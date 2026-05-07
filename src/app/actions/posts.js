@@ -142,3 +142,39 @@ export async function createPost(authorId, data) {
     return { error: "Failed to create post." };
   }
 }
+
+export async function updatePost(postId, authorId, newContent, newImageUrl) {
+  try {
+    const postRef = db.collection("posts").doc(postId);
+    const postDoc = await postRef.get();
+
+    if (!postDoc.exists) return { error: "Post not found." };
+    if (postDoc.data().authorId !== authorId) return { error: "Unauthorized." };
+
+    const updateData = {};
+    if (newContent !== undefined) updateData.content = newContent;
+    if (newImageUrl !== undefined) updateData.imageUrl = newImageUrl;
+
+    await postRef.update(updateData);
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating post:", error);
+    return { error: "Failed to update post." };
+  }
+}
+
+export async function deletePost(postId, authorId) {
+  try {
+    const postRef = db.collection("posts").doc(postId);
+    const postDoc = await postRef.get();
+
+    if (!postDoc.exists) return { error: "Post not found." };
+    if (postDoc.data().authorId !== authorId) return { error: "Unauthorized." };
+
+    await postRef.delete();
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    return { error: "Failed to delete post." };
+  }
+}
