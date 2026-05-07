@@ -1,17 +1,20 @@
 "use client";
 import Link from "next/link";
 import styles from "./page.module.css";
-import { db } from "./lib/firebase-client";
+import { db } from "./lib/firebase/firebase-client";
 import { collection, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
-
+import { useCounterStore } from "./store/zustand";
 export default function Home() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const count = useCounterStore((s) => s.count);
+  const increase = useCounterStore((s) => s.increase);
+  const decrease = useCounterStore((s) => s.decrease);
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "posts"));        
+        const querySnapshot = await getDocs(collection(db, "posts"));
         const postsData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -26,14 +29,17 @@ export default function Home() {
     fetchPosts();
   }, []);
   useEffect(() => {
-  console.log("Posts updated:", posts);
-}, [posts]);
+    console.log("Posts updated:", posts);
+  }, [posts]);
 
   if (loading) return <p>Loading posts...</p>;
 
   return (
     <div className={styles.page}>
       <main>
+        <h1>Counter: {count}</h1>
+        <button onClick={increase}>Increase</button>
+        <button onClick={decrease}>Decrease</button>
         <h1>Home page</h1>
         <Link href="/users">go to users</Link>
         <Link href="/server-users">go to server users</Link>

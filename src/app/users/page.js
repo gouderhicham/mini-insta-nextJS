@@ -2,10 +2,14 @@
 import Link from "next/link";
 import styles from "../page.module.css";
 import { useEffect, useState } from "react";
+import { useCounterStore } from "../store/zustand";
 export default function Home() {
   const [users, setUsers] = useState([]);
   const [name, setName] = useState("");
   const [age, setAge] = useState();
+  const count = useCounterStore((s) => s.count);
+  const increase = useCounterStore((s) => s.increase);
+  const decrease = useCounterStore((s) => s.decrease);
   useEffect(() => {
     const savedUsers = localStorage.getItem("myUsers");
     if (savedUsers) {
@@ -21,6 +25,9 @@ export default function Home() {
     <div className={styles.page}>
       <main>
         <h1>users</h1>
+        <h1>Counter: {count}</h1>
+        <button onClick={increase}>Increase</button>
+        <button onClick={decrease}>Decrease</button>
         <Link href="/">Go back to home</Link>
         <input value={name} onChange={(e) => setName(e.target.value)} />
         <input value={age} onChange={(e) => setAge(e.target.value)} />

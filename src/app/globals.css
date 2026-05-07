@@ -1,12 +1,34 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0f1115;
+  --foreground: #f1f3f5;
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --secondary: #1e2128;
+  --secondary-hover: #2a2e37;
+  --accent: #ec4899;
+  --border: #2a2e37;
+  --input-bg: #15181e;
+  --input-border: #2a2e37;
+  --danger: #ef4444;
+  --success: #10b981;
+  --glass-bg: rgba(30, 33, 40, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #f8fafc;
+    --foreground: #0f172a;
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --secondary: #ffffff;
+    --secondary-hover: #f1f5f9;
+    --accent: #db2777;
+    --border: #e2e8f0;
+    --input-bg: #ffffff;
+    --input-border: #cbd5e1;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(0, 0, 0, 0.08);
   }
 }
 
