@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 // --- SEO & METADATA CONFIGURATION ---
+export const viewport = {
+  themeColor: "#1E2128",
+};
 export const metadata = {
   title: {
     default: "Mini Instagram | Gouder hicham ",
@@ -79,7 +82,7 @@ export default async function RootLayout({ children }) {
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
       <body suppressHydrationWarning className="appBody">
         <Navbar session={latestSession} />
-        <div className="mainContent">
+        <div className={`${session?.user ? 'mainContent' : 'mainContent-no-margin'}`}>
           {children}
         </div>
       </body>
