@@ -1,11 +1,11 @@
 :root {
   --background: #0f1115;
   --foreground: #f1f3f5;
-  --primary: #FF0F47;
+  --primary: #ff0f47;
   --primary-hover: #d10837;
   --secondary: #1e2128;
   --secondary-hover: #2a2e37;
-  --accent: #FFDB8A;
+  --accent: #ffdb8a;
   --border: #2a2e37;
   --input-bg: #15181e;
   --input-border: #2a2e37;
@@ -14,7 +14,6 @@
   --glass-bg: rgba(30, 33, 40, 0.7);
   --glass-border: rgba(255, 255, 255, 0.08);
 }
-
 
 html {
   height: 100%;
@@ -45,6 +44,10 @@ body {
   flex: 1;
   padding-bottom: 60px; /* Space for mobile bottom nav */
 }
+.mainContent-no-margin {
+  flex: 1;
+  padding-bottom: 60px; /* Space for mobile bottom nav */
+}
 
 @media (min-width: 640px) {
   .appBody {
@@ -56,14 +59,13 @@ body {
     width: calc(100% - 250px);
   }
 }
-@media (min-width: 1000px) {
+@media (min-width: 640px) {
   .mainContent-no-margin {
     padding-bottom: 0;
     margin-left: 0px !important; /* Space for left sidebar */
     width: calc(100%);
   }
 }
-
 
 * {
   box-sizing: border-box;
@@ -75,4 +77,3 @@ a {
   color: inherit;
   text-decoration: none;
 }
-
