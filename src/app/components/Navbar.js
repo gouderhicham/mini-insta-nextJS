@@ -34,6 +34,44 @@ export default function Navbar({ session }) {
     return () => clearTimeout(timerId);
   }, [searchQuery]);
 
+  const renderSearchResults = () => {
+    if (!showResults) return null;
+    return (
+      <div className={styles.searchResults}>
+        {isSearching ? (
+          <div className={styles.searchMessage}>Searching...</div>
+        ) : searchResults.length > 0 ? (
+          searchResults.map(u => (
+            <Link 
+              href={`/profile/${u.id}`} 
+              key={u.id} 
+              className={styles.searchResultItem}
+              onClick={() => {
+                setShowResults(false);
+                setShowMobileSearch(false);
+                setSearchQuery("");
+              }}
+            >
+               <div className={styles.searchResultAvatar}>
+                  {u.profilePic ? (
+                    <img src={u.profilePic} alt={u.fullName} />
+                  ) : (
+                    <span>{u.username?.charAt(0).toUpperCase()}</span>
+                  )}
+               </div>
+               <div>
+                  <div className={styles.searchResultName}>{u.fullName || u.username}</div>
+                  <div className={styles.searchResultUsername}>@{u.username}</div>
+               </div>
+            </Link>
+          ))
+        ) : (
+          <div className={styles.searchMessage}>No users found.</div>
+        )}
+      </div>
+    );
+  };
+
   if (!session?.user) return null;
 
   return (
@@ -66,6 +104,8 @@ export default function Navbar({ session }) {
               onFocus={() => searchQuery.trim() && setShowResults(true)}
               onBlur={() => setTimeout(() => setShowResults(false), 200)}
             />
+            {/* Search Results Dropdown - Desktop */}
+            {renderSearchResults()}
           </div>
           
           {/* Mobile Search Button */}
@@ -76,33 +116,6 @@ export default function Navbar({ session }) {
             <Image src="/search-icon.svg" alt="Search" width={24} height={24} className={styles.icon} />
             <span className={styles.navText}>Search</span>
           </button>
-
-          {/* Search Results Dropdown */}
-          {showResults && (
-            <div className={styles.searchResults}>
-              {isSearching ? (
-                <div className={styles.searchMessage}>Searching...</div>
-              ) : searchResults.length > 0 ? (
-                searchResults.map(u => (
-                  <Link href={`/profile/${u.id}`} key={u.id} className={styles.searchResultItem}>
-                     <div className={styles.searchResultAvatar}>
-                        {u.profilePic ? (
-                          <img src={u.profilePic} alt={u.fullName} />
-                        ) : (
-                          <span>{u.username?.charAt(0).toUpperCase()}</span>
-                        )}
-                     </div>
-                     <div>
-                        <div className={styles.searchResultName}>{u.fullName || u.username}</div>
-                        <div className={styles.searchResultUsername}>@{u.username}</div>
-                     </div>
-                  </Link>
-                ))
-              ) : (
-                <div className={styles.searchMessage}>No users found.</div>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Profile */}
@@ -131,6 +144,8 @@ export default function Navbar({ session }) {
               onBlur={() => setTimeout(() => setShowResults(false), 200)}
               autoFocus
             />
+            {/* Search Results Dropdown - Mobile */}
+            {renderSearchResults()}
         </div>
       )}
     </nav>
