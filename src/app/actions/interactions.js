@@ -2,14 +2,22 @@
 
 import { db } from "../lib/firebase/firebase.admin";
 import admin from "firebase-admin";
+import { createNotification } from "./notifications";
 
 export async function setPostLikeStatus(postId, uid, isLiked) {
   try {
     const likeRef = db.collection("posts").doc(postId).collection("likes").doc(uid);
     const postRef = db.collection("posts").doc(postId);
 
+    let targetUserId = null;
+
     await db.runTransaction(async (transaction) => {
       const likeDoc = await transaction.get(likeRef);
+      const postDoc = await transaction.get(postRef);
+      
+      if (!postDoc.exists) return; // Should not happen but safe
+      targetUserId = postDoc.data().authorId;
+
       if (isLiked && !likeDoc.exists) {
         transaction.set(likeRef, { createdAt: admin.firestore.FieldValue.serverTimestamp() });
         transaction.update(postRef, { likeCount: admin.firestore.FieldValue.increment(1) });
@@ -18,6 +26,16 @@ export async function setPostLikeStatus(postId, uid, isLiked) {
         transaction.update(postRef, { likeCount: admin.firestore.FieldValue.increment(-1) });
       }
     });
+
+    // Trigger notification
+    if (isLiked && targetUserId) {
+      await createNotification({
+        type: "post_like",
+        actor_id: uid,
+        target_user_id: targetUserId,
+        post_id: postId,
+      });
+    }
     return { success: true };
   } catch (error) {
     console.error("Error updating post like status:", error);
@@ -42,10 +60,29 @@ export async function addComment(postId, uid, text) {
     const postRef = db.collection("posts").doc(postId);
     const commentRef = postRef.collection("comments").doc();
 
+    let targetUserId = null;
+
     await db.runTransaction(async (transaction) => {
+      const postDoc = await transaction.get(postRef);
+      if (postDoc.exists) {
+        targetUserId = postDoc.data().authorId;
+      }
+      
       transaction.set(commentRef, commentData);
       transaction.update(postRef, { commentCount: admin.firestore.FieldValue.increment(1) });
     });
+
+    // Trigger notification for the post author
+    if (targetUserId) {
+      await createNotification({
+        type: "post_comment",
+        actor_id: uid,
+        target_user_id: targetUserId,
+        post_id: postId,
+        comment_id: commentRef.id,
+        content: text,
+      });
+    }
 
     // Return the inserted comment for optimistic UI
     return { 
@@ -116,8 +153,17 @@ export async function setCommentLikeStatus(postId, commentId, uid, isLiked) {
     const likeRef = db.collection("posts").doc(postId).collection("comments").doc(commentId).collection("likes").doc(uid);
     const commentRef = db.collection("posts").doc(postId).collection("comments").doc(commentId);
 
+    let targetUserId = null;
+    let commentText = "";
+
     await db.runTransaction(async (transaction) => {
       const likeDoc = await transaction.get(likeRef);
+      const commentDoc = await transaction.get(commentRef);
+      
+      if (!commentDoc.exists) return;
+      targetUserId = commentDoc.data().authorId;
+      commentText = commentDoc.data().text || "";
+
       if (isLiked && !likeDoc.exists) {
         transaction.set(likeRef, { createdAt: admin.firestore.FieldValue.serverTimestamp() });
         transaction.update(commentRef, { likeCount: admin.firestore.FieldValue.increment(1) });
@@ -126,6 +172,18 @@ export async function setCommentLikeStatus(postId, commentId, uid, isLiked) {
         transaction.update(commentRef, { likeCount: admin.firestore.FieldValue.increment(-1) });
       }
     });
+
+    // Trigger notification for the comment author
+    if (isLiked && targetUserId) {
+      await createNotification({
+        type: "comment_like",
+        actor_id: uid,
+        target_user_id: targetUserId,
+        post_id: postId,
+        comment_id: commentId,
+        content: commentText,
+      });
+    }
     return { success: true };
   } catch (error) {
     console.error("Error updating comment like status:", error);

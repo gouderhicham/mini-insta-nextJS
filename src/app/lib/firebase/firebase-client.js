@@ -1,6 +1,6 @@
 "use client"
-import { initializeApp } from "firebase/app";
-import { getFirestore, initializeFirestore, persistentLocalCache } from "firebase/firestore";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
@@ -13,9 +13,21 @@ const firebaseConfig = {
   measurementId: "G-CHTF6M8NS1"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache()
-});
-export const auth = getAuth(app);
+// Initialize Firebase singleton
+let app;
+let db;
+let auth;
+
+if (!getApps().length) {
+  app = initializeApp(firebaseConfig);
+  db = initializeFirestore(app, {
+    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+  });
+  auth = getAuth(app);
+} else {
+  app = getApp();
+  db = getFirestore(app);
+  auth = getAuth(app);
+}
+
+export { app, db, auth };

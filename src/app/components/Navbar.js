@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { signOut } from "next-auth/react";
 import { searchUsers } from "../actions/users";
+import { db } from "../lib/firebase/firebase-client";
+import { doc, onSnapshot } from "firebase/firestore";
 import styles from "./Navbar.module.css";
 
 export default function Navbar({ session }) {
@@ -13,6 +15,31 @@ export default function Navbar({ session }) {
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0); 
+  const [toastMessage, setToastMessage] = useState(null);
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+
+    // Listen to user document for real-time unread_notification_count changes
+    const userRef = doc(db, "users", session.user.id);
+    const unsubscribe = onSnapshot(userRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const newCount = docSnap.data().unread_notification_count || 0;
+        
+        setUnreadCount((prevCount) => {
+          // If count increased, show a toast
+          if (newCount > prevCount && prevCount !== undefined) {
+            setToastMessage("You have a new notification");
+            setTimeout(() => setToastMessage(null), 3000);
+          }
+          return newCount;
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, [session?.user?.id]);
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -118,6 +145,15 @@ export default function Navbar({ session }) {
           </button>
         </div>
 
+        {/* Notifications */}
+        <Link href="/notifications" className={`${styles.navItem} ${styles.notificationBtn}`}>
+          <div className={styles.iconWrapper}>
+            <Image src="/notification-icon.svg" alt="Notifications" width={24} height={24} className={styles.icon} />
+            {unreadCount > 0 && <span className={styles.notificationBadge}>{unreadCount}</span>}
+          </div>
+          <span className={styles.navText}>Notifications</span>
+        </Link>
+
         {/* Profile */}
         <Link href={`/profile/${session.user.id}`} className={styles.navItem}>
           <Image src="/my-profile-icon.svg" alt="Profile" width={24} height={24} className={styles.icon} />
@@ -146,6 +182,14 @@ export default function Navbar({ session }) {
             />
             {/* Search Results Dropdown - Mobile */}
             {renderSearchResults()}
+        </div>
+      )}
+
+      {/* Real-time Toast Notification */}
+      {toastMessage && (
+        <div className={styles.toast}>
+          <Image src="/notification-icon.svg" alt="Bell" width={16} height={16} />
+          {toastMessage}
         </div>
       )}
     </nav>

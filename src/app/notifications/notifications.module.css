@@ -1,0 +1,167 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.markAllBtn {
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.markAllBtn:hover {
+  opacity: 0.8;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notificationItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.notificationItem:hover {
+  background: var(--secondary-hover);
+  transform: translateY(-1px);
+}
+
+.unread {
+  background: rgba(var(--primary-rgb), 0.05);
+  border-color: var(--primary);
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar span {
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.content {
+  flex: 1;
+}
+
+.text {
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.actorName {
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--foreground);
+}
+
+.actorName:hover {
+  text-decoration: underline;
+}
+
+.time {
+  font-size: 0.8125rem;
+  color: #888;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.unreadDot {
+  width: 10px;
+  height: 10px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #888;
+  background: var(--glass-bg);
+  border-radius: 12px;
+  border: 1px dashed var(--glass-border);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.deleteBtn {
+  background: transparent;
+  border: none;
+  color: #888;
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  opacity: 0;
+}
+
+.notificationItem:hover .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  background: rgba(255, 0, 0, 0.1);
+  color: #ff4444;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding-top: 5rem; /* Space for the floating notification button */
+    padding-bottom: 5rem; /* Space for bottom nav */
+  }
+}

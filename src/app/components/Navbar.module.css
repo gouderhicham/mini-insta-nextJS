@@ -53,6 +53,30 @@
   height: 24px;
 }
 
+.iconWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notificationBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color: #ff3b30; /* Red background */
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
 .desktopSearch {
   display: none;
 }
@@ -65,6 +89,22 @@
 
 .mobileSearchBtn {
   display: flex;
+}
+
+.notificationBtn {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  width: auto;
+  height: auto;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  padding: 0.75rem;
+  z-index: 60;
+  flex: none;
 }
 
 .mobileSearchOverlay {
@@ -204,6 +244,17 @@
     width: 100%;
   }
 
+  .notificationBtn {
+    position: static;
+    background: transparent;
+    backdrop-filter: none;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    z-index: auto;
+    display: flex;
+  }
+
   .navItem:hover {
     background-color: var(--secondary-hover);
   }
@@ -265,4 +316,40 @@
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.toast {
+  position: fixed;
+  bottom: 80px; /* Above the mobile nav bar */
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  animation: slideUpToast 0.3s ease-out forwards, fadeOutToast 0.3s ease-in 2.7s forwards;
+}
+
+@media (min-width: 640px) {
+  .toast {
+    bottom: 24px;
+    left: calc(50% + 125px); /* Offset by desktop sidebar width */
+  }
+}
+
+@keyframes slideUpToast {
+  from { opacity: 0; transform: translate(-50%, 20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes fadeOutToast {
+  from { opacity: 1; transform: translate(-50%, 0); }
+  to { opacity: 0; transform: translate(-50%, -10px); }
 }

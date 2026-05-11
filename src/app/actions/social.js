@@ -2,6 +2,7 @@
 
 import { db } from "../lib/firebase/firebase.admin";
 import admin from "firebase-admin";
+import { createNotification } from "./notifications";
 
 export async function toggleFollow(followerId, followingId, isFollowing) {
   try {
@@ -27,6 +28,15 @@ export async function toggleFollow(followerId, followingId, isFollowing) {
         transaction.update(followingUserRef, { followerCount: admin.firestore.FieldValue.increment(-1) });
       }
     });
+    
+    // Trigger notification
+    if (isFollowing) {
+      await createNotification({
+        type: "new_follow",
+        actor_id: followerId,
+        target_user_id: followingId,
+      });
+    }
 
     return { success: true };
   } catch (error) {

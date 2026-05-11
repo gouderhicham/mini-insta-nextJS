@@ -178,3 +178,47 @@ export async function deletePost(postId, authorId) {
     return { error: "Failed to delete post." };
   }
 }
+
+export async function getPost(postId, currentUserId = null) {
+  try {
+    const postRef = db.collection("posts").doc(postId);
+    const postDoc = await postRef.get();
+
+    if (!postDoc.exists) return { error: "Post not found." };
+
+    const postData = postDoc.data();
+    let isLikedByMe = false;
+
+    if (currentUserId) {
+      const likeDoc = await db.collection("posts").doc(postId).collection("likes").doc(currentUserId).get();
+      isLikedByMe = likeDoc.exists;
+    }
+
+    // Populate with latest author data
+    let authorName = postData.authorName;
+    let authorPic = postData.authorPic;
+
+    if (postData.authorId) {
+      const userDoc = await db.collection("users").doc(postData.authorId).get();
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        authorName = userData.fullName || userData.username || authorName;
+        authorPic = userData.profilePic || authorPic;
+      }
+    }
+
+    const post = {
+      id: postDoc.id,
+      ...postData,
+      authorName,
+      authorPic,
+      isLikedByMe,
+      createdAt: postData.createdAt?.toDate().toISOString() || new Date().toISOString(),
+    };
+
+    return { post };
+  } catch (error) {
+    console.error("Error fetching post:", error);
+    return { error: "Failed to fetch post." };
+  }
+}
