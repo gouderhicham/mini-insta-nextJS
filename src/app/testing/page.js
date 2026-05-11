@@ -89,7 +89,7 @@ export default function ImageUploader() {
   const uploadImage = async () => {
     if (!image) return;
     setUploading(true);
-    const apiKey = "fd01840e3c9f6a1083d8081293cfd399";
+    const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
     const formData = new FormData();
     formData.append("image", image);
 
