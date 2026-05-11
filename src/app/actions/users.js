@@ -1,8 +1,9 @@
 "use server";
 
 import { db } from "../lib/firebase/firebase.admin";
+import { cache } from "react";
 
-export async function getUserProfile(uid) {
+export const getUserProfile = cache(async (uid) => {
   try {
     const userDoc = await db.collection("users").doc(uid).get();
     if (!userDoc.exists) return { error: "User not found" };
@@ -19,7 +20,7 @@ export async function getUserProfile(uid) {
     console.error("Error fetching user:", error);
     return { error: "Failed to fetch user." };
   }
-}
+});
 
 export async function updateUserProfile(uid, data) {
   try {

@@ -45,7 +45,9 @@ export async function toggleFollow(followerId, followingId, isFollowing) {
   }
 }
 
-export async function checkIsFollowing(followerId, followingId) {
+import { cache } from "react";
+
+export const checkIsFollowing = cache(async (followerId, followingId) => {
   if (!followerId || !followingId) return { isFollowing: false };
   try {
     const relationshipId = `${followerId}_${followingId}`;
@@ -55,9 +57,9 @@ export async function checkIsFollowing(followerId, followingId) {
     console.error("Error checking follow status:", error);
     return { isFollowing: false };
   }
-}
+});
 
-export async function getFollowers(uid) {
+export const getFollowers = cache(async (uid) => {
   try {
     const snapshot = await db.collection("social_graph").where("followingId", "==", uid).get();
     
@@ -66,7 +68,7 @@ export async function getFollowers(uid) {
 
     if (userIds.length === 0) return { users: [] };
 
-    // Fetch user profiles (batches of 10 for Firestore 'in' queries, but doing individual gets for simplicity and safety)
+    // Fetch user profiles
     const users = await Promise.all(
       userIds.map(async (id) => {
         const userDoc = await db.collection("users").doc(id).get();
@@ -88,9 +90,9 @@ export async function getFollowers(uid) {
     console.error("Error getting followers:", error);
     return { error: "Failed to get followers." };
   }
-}
+});
 
-export async function getFollowing(uid) {
+export const getFollowing = cache(async (uid) => {
   try {
     const snapshot = await db.collection("social_graph").where("followerId", "==", uid).get();
     
@@ -120,4 +122,4 @@ export async function getFollowing(uid) {
     console.error("Error getting following:", error);
     return { error: "Failed to get following." };
   }
-}
+});

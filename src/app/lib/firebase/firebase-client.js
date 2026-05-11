@@ -20,14 +20,11 @@ let auth;
 
 if (!getApps().length) {
   app = initializeApp(firebaseConfig);
-  db = initializeFirestore(app, {
-    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
-  });
-  auth = getAuth(app);
 } else {
   app = getApp();
-  db = getFirestore(app);
-  auth = getAuth(app);
 }
+
+db = getFirestore(app);
+auth = getAuth(app);
 
 export { app, db, auth };

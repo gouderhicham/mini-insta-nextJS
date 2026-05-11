@@ -7,6 +7,11 @@ import Link from "next/link";
 import CreatePost from "./components/CreatePost";
 import PostItem from "./components/PostItem";
 
+export const metadata = {
+  title: "Feed",
+  description: "Your personalized Mini Insta feed. Discover new posts and connect with friends.",
+};
+
 export default async function Home() {
   const session = await auth();
 

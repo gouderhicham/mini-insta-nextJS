@@ -5,6 +5,24 @@ import { checkIsFollowing } from "../../actions/social";
 import UserProfileClient from "../../components/UserProfileClient";
 import { notFound } from "next/navigation";
 
+export async function generateMetadata(props) {
+  const params = await props.params;
+  const { id } = params;
+  const { user } = await getUserProfile(id);
+
+  if (!user) {
+    return {
+      title: "Profile Not Found",
+    };
+  }
+
+  const name = user.fullName || user.username || "User Profile";
+  return {
+    title: name,
+    description: `Check out ${name}'s profile, posts, and updates on Mini Insta.`,
+  };
+}
+
 export default async function ProfilePage(props) {
   const params = await props.params;
   const { id } = params;

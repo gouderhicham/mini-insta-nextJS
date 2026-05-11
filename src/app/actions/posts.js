@@ -2,6 +2,7 @@
 
 import { db } from "../lib/firebase/firebase.admin";
 import admin from "firebase-admin";
+import { cache } from "react";
 
 export async function getPosts(currentUserId = null) {
   try {
@@ -17,7 +18,16 @@ export async function getPosts(currentUserId = null) {
       });
     });
 
-    // Populate with latest author data
+    // Populate with latest author data using a local cache to avoid N+1 queries
+    const userCache = new Map();
+    const fetchUser = async (authorId) => {
+      if (userCache.has(authorId)) return userCache.get(authorId);
+      const userDoc = await db.collection("users").doc(authorId).get();
+      const userData = userDoc.exists ? userDoc.data() : null;
+      userCache.set(authorId, userData);
+      return userData;
+    };
+
     const populatedPosts = await Promise.all(
       posts.map(async (post) => {
         try {
@@ -28,9 +38,8 @@ export async function getPosts(currentUserId = null) {
           }
 
           if (post.authorId) {
-            const userDoc = await db.collection("users").doc(post.authorId).get();
-            if (userDoc.exists) {
-              const userData = userDoc.data();
+            const userData = await fetchUser(post.authorId);
+            if (userData) {
               return {
                 ...post,
                 authorName: userData.fullName || userData.username || post.authorName,
@@ -74,7 +83,16 @@ export async function getUserPosts(authorId, currentUserId = null) {
 
     posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    // Populate with latest author data
+    // Populate with latest author data using a local cache to avoid N+1 queries
+    const userCache = new Map();
+    const fetchUser = async (authorId) => {
+      if (userCache.has(authorId)) return userCache.get(authorId);
+      const userDoc = await db.collection("users").doc(authorId).get();
+      const userData = userDoc.exists ? userDoc.data() : null;
+      userCache.set(authorId, userData);
+      return userData;
+    };
+
     const populatedPosts = await Promise.all(
       posts.map(async (post) => {
         try {
@@ -85,9 +103,8 @@ export async function getUserPosts(authorId, currentUserId = null) {
           }
 
           if (post.authorId) {
-            const userDoc = await db.collection("users").doc(post.authorId).get();
-            if (userDoc.exists) {
-              const userData = userDoc.data();
+            const userData = await fetchUser(post.authorId);
+            if (userData) {
               return {
                 ...post,
                 authorName: userData.fullName || userData.username || post.authorName,
@@ -179,7 +196,7 @@ export async function deletePost(postId, authorId) {
   }
 }
 
-export async function getPost(postId, currentUserId = null) {
+export const getPost = cache(async (postId, currentUserId = null) => {
   try {
     const postRef = db.collection("posts").doc(postId);
     const postDoc = await postRef.get();
@@ -221,4 +238,4 @@ export async function getPost(postId, currentUserId = null) {
     console.error("Error fetching post:", error);
     return { error: "Failed to fetch post." };
   }
-}
+});

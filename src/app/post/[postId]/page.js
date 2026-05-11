@@ -5,6 +5,25 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import styles from "./post.module.css";
 
+export async function generateMetadata({ params }) {
+  const { postId } = await params;
+  const { post } = await getPost(postId, null);
+
+  if (!post) {
+    return {
+      title: "Post Not Found",
+    };
+  }
+
+  const contentSnippet = post.content ? (post.content.substring(0, 60) + (post.content.length > 60 ? "..." : "")) : "View this post";
+  const authorName = post.user?.username || post.user?.fullName || "A user";
+  
+  return {
+    title: `${authorName} on Mini Insta: "${contentSnippet}"`,
+    description: `Check out what ${authorName} posted on Mini Insta.`,
+  };
+}
+
 export default async function SinglePostPage({ params }) {
   const { postId } = await params;
   const session = await auth();

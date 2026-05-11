@@ -20,11 +20,11 @@ export const viewport = {
 };
 export const metadata = {
   title: {
-    default: "Mini Instagram | Gouder hicham ",
-    template: "%s | Gouder hicham ",
+    default: "Mini Instagram | Gouder Hicham",
+    template: "%s | Mini Insta",
   },
-  description: "Gouder hicham website , a mini social media website with instagram features ",
-  keywords: ["Next.js", "React", "Web Development", "Gouder Hicham"],
+  description: "A mini social media application featuring Instagram-like functionalities such as posts, likes, comments, and real-time notifications.",
+  keywords: ["Next.js", "React", "Social Media", "Instagram Clone", "Firebase", "Web Development", "Gouder Hicham"],
   authors: [{ name: "Gouder Hicham" }],
   creator: "Gouder Hicham",
   metadataBase: new URL("https://mini-insta-next-js.vercel.app/"),
@@ -32,16 +32,16 @@ export const metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Gouder Hicham",
-    description: "Catchy description for social media shares.",
+    title: "Mini Instagram | Gouder Hicham",
+    description: "Join our mini social network. Share posts, follow friends, and interact in real-time.",
     url: "https://mini-insta-next-js.vercel.app/",
-    siteName: "Gouder hicham",
+    siteName: "Mini Insta",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Brand Logo",
+        alt: "Mini Instagram App Logo",
       },
     ],
     locale: "en_US",
@@ -49,8 +49,8 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Your Brand Name",
-    description: "Catchy description for Twitter/X.",
+    title: "Mini Instagram | Gouder Hicham",
+    description: "Join our mini social network. Share posts, follow friends, and interact in real-time.",
     images: ["/og-image.png"],
   },
   robots: {
