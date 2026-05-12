@@ -2,7 +2,7 @@
 
 A modern, high-performance social media web application built with **Next.js 15**, **Firebase**, and **Auth.js (NextAuth)**. Experience real-time interactions, seamless notifications, and a premium UI.
 
-🚀 **Live Demo:** [https://mini-insta-next-js.vercel.app/](https://mini-insta-next-js.vercel.app/)
+🚀 **Live Demo:** [https://mini-insta-next-js.vercel.app/](https://mininsta-gh.vercel.app/)
 
 ---
 
