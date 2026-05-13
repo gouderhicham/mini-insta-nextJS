@@ -10,7 +10,13 @@ import CreatePost from "./CreatePost";
 import PostItem from "./PostItem";
 import { formatTimeAgo } from "../lib/formatDate";
 
-export default function UserProfileClient({ userProfile, userPosts, isOwner, currentUser, initialIsFollowing }) {
+export default function UserProfileClient({
+  userProfile,
+  userPosts,
+  isOwner,
+  currentUser,
+  initialIsFollowing,
+}) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [fullName, setFullName] = useState(userProfile.fullName || "");
@@ -21,9 +27,13 @@ export default function UserProfileClient({ userProfile, userPosts, isOwner, cur
 
   // Social State
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing || false);
-  const [followerCount, setFollowerCount] = useState(userProfile.followerCount || 0);
-  const [followingCount, setFollowingCount] = useState(userProfile.followingCount || 0);
-  
+  const [followerCount, setFollowerCount] = useState(
+    userProfile.followerCount || 0,
+  );
+  const [followingCount, setFollowingCount] = useState(
+    userProfile.followingCount || 0,
+  );
+
   // Modals
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
@@ -69,7 +79,7 @@ export default function UserProfileClient({ userProfile, userPosts, isOwner, cur
                 }
               },
               "image/jpeg",
-              q
+              q,
             );
           };
           attemptCompression(quality);
@@ -85,10 +95,13 @@ export default function UserProfileClient({ userProfile, userPosts, isOwner, cur
     formData.append("image", imageFile);
 
     try {
-      const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        `https://api.imgbb.com/1/upload?key=${apiKey}`,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
       const data = await response.json();
       if (data.success) {
         setProfilePic(data.data.url);
@@ -130,13 +143,17 @@ export default function UserProfileClient({ userProfile, userPosts, isOwner, cur
     }
     const newIsFollowing = !isFollowing;
     setIsFollowing(newIsFollowing);
-    setFollowerCount(prev => newIsFollowing ? prev + 1 : prev - 1);
+    setFollowerCount((prev) => (newIsFollowing ? prev + 1 : prev - 1));
 
-    const res = await toggleFollow(currentUser.id, userProfile.id, newIsFollowing);
+    const res = await toggleFollow(
+      currentUser.id,
+      userProfile.id,
+      newIsFollowing,
+    );
     if (res.error) {
       // Revert optimistic update
       setIsFollowing(!newIsFollowing);
-      setFollowerCount(prev => !newIsFollowing ? prev + 1 : prev - 1);
+      setFollowerCount((prev) => (!newIsFollowing ? prev + 1 : prev - 1));
       alert(res.error);
     } else {
       router.refresh();
@@ -177,23 +194,35 @@ export default function UserProfileClient({ userProfile, userPosts, isOwner, cur
           <div className={styles.headerRow}>
             <div className={styles.avatarWrapper}>
               {profilePic ? (
-                <img src={profilePic} alt="Profile" className={styles.avatarImage} />
+                <img
+                  src={profilePic}
+                  alt="Profile"
+                  className={styles.avatarImage}
+                />
               ) : (
                 <div className={styles.avatarInitial}>
-                  {userProfile.username ? userProfile.username.charAt(0).toUpperCase() : "U"}
+                  {userProfile.username
+                    ? userProfile.username.charAt(0).toUpperCase()
+                    : "U"}
                 </div>
               )}
               {isEditing && (
                 <label className={styles.avatarOverlay}>
                   {uploading ? "Uploading..." : "Change"}
-                  <input type="file" accept="image/*" onChange={handleFileChange} className={styles.fileInput} disabled={uploading} />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className={styles.fileInput}
+                    disabled={uploading}
+                  />
                 </label>
               )}
             </div>
-            
+
             <div className={styles.actionButtons}>
               {isOwner && !isEditing && (
-                <button 
+                <button
                   onClick={() => setIsEditing(true)}
                   className={`${styles.button} ${styles.buttonSecondary}`}
                 >
@@ -202,13 +231,13 @@ export default function UserProfileClient({ userProfile, userPosts, isOwner, cur
               )}
               {isOwner && isEditing && (
                 <>
-                  <button 
+                  <button
                     onClick={() => setIsEditing(false)}
                     className={`${styles.button} ${styles.buttonSecondary}`}
                   >
                     Cancel
                   </button>
-                  <button 
+                  <button
                     onClick={handleSave}
                     disabled={saving || uploading}
                     className={`${styles.button} ${styles.buttonPrimary}`}
@@ -218,12 +247,21 @@ export default function UserProfileClient({ userProfile, userPosts, isOwner, cur
                 </>
               )}
               {!isOwner && currentUser && (
-                <button 
-                  onClick={handleToggleFollow}
-                  className={`${styles.button} ${isFollowing ? styles.buttonSecondary : styles.buttonPrimary}`}
-                >
-                  {isFollowing ? "Following" : "Follow"}
-                </button>
+                <>
+                  <button
+                    onClick={handleToggleFollow}
+                    className={`${styles.button} ${isFollowing ? styles.buttonSecondary : styles.buttonPrimary}`}
+                  >
+                    {isFollowing ? "Following" : "Follow"}
+                  </button>
+                  <button className={`${styles.button} ${styles.buttonSecondary}`}>
+                    <Link
+                      href={`/messages?userId=${userProfile.id}`}
+                    >
+                      Message
+                    </Link>
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -233,8 +271,8 @@ export default function UserProfileClient({ userProfile, userPosts, isOwner, cur
               <div className={styles.editForm}>
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>Full Name</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className={styles.input}
@@ -243,7 +281,7 @@ export default function UserProfileClient({ userProfile, userPosts, isOwner, cur
                 </div>
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>Bio</label>
-                  <textarea 
+                  <textarea
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
                     className={styles.textarea}
@@ -253,9 +291,11 @@ export default function UserProfileClient({ userProfile, userPosts, isOwner, cur
               </div>
             ) : (
               <>
-                <h1 className={styles.name}>{userProfile.fullName || userProfile.username}</h1>
+                <h1 className={styles.name}>
+                  {userProfile.fullName || userProfile.username}
+                </h1>
                 <p className={styles.username}>@{userProfile.username}</p>
-                
+
                 <div className={styles.statsRow}>
                   <div className={styles.statItem} onClick={openFollowersModal}>
                     <span className={styles.statValue}>{followerCount}</span>
@@ -278,43 +318,51 @@ export default function UserProfileClient({ userProfile, userPosts, isOwner, cur
         </div>
 
         <div className={styles.postsSection}>
-          <h2 className={styles.sectionTitle}>Posts by {userProfile.fullName || userProfile.username}</h2>
-        
-        {isOwner && currentUser && (
-          <CreatePost user={currentUser} />
-        )}
+          <h2 className={styles.sectionTitle}>
+            Posts by {userProfile.fullName || userProfile.username}
+          </h2>
 
-        {userPosts && userPosts.length > 0 ? (
-          <div className={styles.postsList}>
-            {userPosts.map((post) => (
-              <PostItem key={post.id} post={post} currentUser={currentUser} />
-            ))}
-          </div>
-        ) : (
-          <div className={styles.emptyState}>
-            <p>This user hasn't posted anything yet.</p>
-          </div>
-        )}
-      </div>
-      
+          {isOwner && currentUser && <CreatePost user={currentUser} />}
+
+          {userPosts && userPosts.length > 0 ? (
+            <div className={styles.postsList}>
+              {userPosts.map((post) => (
+                <PostItem key={post.id} post={post} currentUser={currentUser} />
+              ))}
+            </div>
+          ) : (
+            <div className={styles.emptyState}>
+              <p>This user hasn't posted anything yet.</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Social Modal */}
       {(showFollowers || showFollowing) && (
         <div className={styles.modalOverlay} onClick={closeModal}>
-          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className={styles.modalHeader}>
               <h3 className={styles.modalTitle}>
                 {showFollowers ? "Followers" : "Following"}
               </h3>
-              <button className={styles.closeButton} onClick={closeModal}>&times;</button>
+              <button className={styles.closeButton} onClick={closeModal}>
+                &times;
+              </button>
             </div>
             <div className={styles.modalBody}>
               {isLoadingModal ? (
                 <div className={styles.loadingModal}>Loading...</div>
               ) : modalUsers.length > 0 ? (
-                modalUsers.map(u => (
-                  <Link href={`/profile/${u.id}`} key={u.id} onClick={closeModal}>
+                modalUsers.map((u) => (
+                  <Link
+                    href={`/profile/${u.id}`}
+                    key={u.id}
+                    onClick={closeModal}
+                  >
                     <div className={styles.userRow}>
                       <div className={styles.userRowAvatar}>
                         {u.profilePic ? (
@@ -325,7 +373,9 @@ export default function UserProfileClient({ userProfile, userPosts, isOwner, cur
                       </div>
                       <div className={styles.userRowInfo}>
                         <div className={styles.userRowName}>{u.fullName}</div>
-                        <div className={styles.userRowUsername}>@{u.username}</div>
+                        <div className={styles.userRowUsername}>
+                          @{u.username}
+                        </div>
                       </div>
                     </div>
                   </Link>

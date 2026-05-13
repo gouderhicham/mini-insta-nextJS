@@ -85,3 +85,31 @@ Ensures username uniqueness across the platform.
     - `uid`: string (The owner of the username).
 
 ---
+
+## 7. Root Collection: `chats` (Messaging Inbox)
+Stores the high-level conversation metadata. This prevents fetching the entire message history just to show the inbox list. It is optimized for speed and cheap reads.
+- **Path:** `/chats/{chatId}`
+- **ID:** Combined UID (e.g., `uid1_uid2` sorted alphabetically).
+
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `participants` | array | Array of UIDs in the chat (e.g., `["uid1", "uid2"]`). Allows querying inbox. |
+| `lastMessage` | string | Snippet of the latest message to show in the inbox UI. |
+| `lastMessageAt` | timestamp | Used to sort the inbox by most recent activity. |
+| `unreadCount` | map | Tracks unread count cheaply (e.g., `{ "uid1": 0, "uid2": 1 }`). |
+| `lastReadMessageId` | map | Cheap read receipts (e.g., `{ "uid1": "msgId", "uid2": "msgId" }`). 1 write vs N per-message updates. |
+
+---
+
+## 8. Sub-collection: `messages` (Chat History)
+Stores the actual messages. Kept as a subcollection to isolate data and keep queries extremely fast.
+- **Path:** `/chats/{chatId}/messages/{messageId}`
+- **ID:** Auto-generated.
+
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `senderId` | string | UID of the person who sent the message. |
+| `text` | string | The message content. |
+| `createdAt` | timestamp | Time the message was sent (for ordering). |
+
+*Note: No per-message `read` field. Read status is tracked via `lastReadMessageId` on the parent chat doc — this is 1 write instead of N writes when marking messages as read.*
