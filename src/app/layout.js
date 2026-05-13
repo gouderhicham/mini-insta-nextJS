@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "./components/Navbar";
 import { auth } from "../auth";
 import { getUserProfile } from "./actions/users";
+import SocketInitializer from "./components/SocketInitializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,8 +24,17 @@ export const metadata = {
     default: "Mini Instagram | Gouder Hicham",
     template: "%s | Mini Insta",
   },
-  description: "A mini social media application featuring Instagram-like functionalities such as posts, likes, comments, and real-time notifications.",
-  keywords: ["Next.js", "React", "Social Media", "Instagram Clone", "Firebase", "Web Development", "Gouder Hicham"],
+  description:
+    "A mini social media application featuring Instagram-like functionalities such as posts, likes, comments, and real-time notifications.",
+  keywords: [
+    "Next.js",
+    "React",
+    "Social Media",
+    "Instagram Clone",
+    "Firebase",
+    "Web Development",
+    "Gouder Hicham",
+  ],
   authors: [{ name: "Gouder Hicham" }],
   creator: "Gouder Hicham",
   metadataBase: new URL("https://mini-insta-next-js.vercel.app/"),
@@ -33,7 +43,8 @@ export const metadata = {
   },
   openGraph: {
     title: "Mini Instagram | Gouder Hicham",
-    description: "Join our mini social network. Share posts, follow friends, and interact in real-time.",
+    description:
+      "Join our mini social network. Share posts, follow friends, and interact in real-time.",
     url: "https://mini-insta-next-js.vercel.app/",
     siteName: "Mini Insta",
     images: [
@@ -50,7 +61,8 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Mini Instagram | Gouder Hicham",
-    description: "Join our mini social network. Share posts, follow friends, and interact in real-time.",
+    description:
+      "Join our mini social network. Share posts, follow friends, and interact in real-time.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -61,7 +73,7 @@ export const metadata = {
 
 export default async function RootLayout({ children }) {
   const session = await auth();
-  
+
   // Fetch latest user info from Firestore so Navbar gets the newest profile picture
   let latestSession = session;
   if (session?.user?.id) {
@@ -73,16 +85,22 @@ export default async function RootLayout({ children }) {
           ...session.user,
           name: user.fullName || user.username || session.user.name,
           image: user.profilePic || session.user.image,
-        }
+        },
       };
     }
   }
 
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+    >
       <body suppressHydrationWarning className="appBody">
+        <SocketInitializer userId={session?.user?.id} />
         <Navbar session={latestSession} />
-        <div className={`${session?.user ? 'mainContent' : 'mainContent-no-margin'}`}>
+        <div
+          className={`${session?.user ? "mainContent" : "mainContent-no-margin"}`}
+        >
           {children}
         </div>
       </body>

@@ -159,6 +159,12 @@ export default function Navbar({ session }) {
           <Image src="/my-profile-icon.svg" alt="Profile" width={24} height={24} className={styles.icon} />
           <span className={styles.navText}>Profile</span>
         </Link>
+
+        {/* Messages */}
+        <Link href="/messages" className={styles.navItem}>
+          <Image src="/message-icon.svg" alt="Messages" width={24} height={24} className={styles.icon} />
+          <span className={styles.navText}>Messages</span>
+        </Link>
         
         {/* Log Out */}
         <button onClick={() => signOut()} className={styles.navItem}>
