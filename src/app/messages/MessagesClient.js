@@ -33,9 +33,20 @@ export default function MessagesClient({ currentUser }) {
   const typingTimeoutRef = useRef(null);
   const isTypingRef = useRef(false);
   const selectedChatRef = useRef(null);
+  const initialSelectionDone = useRef(false);
 
   // Keep ref in sync with state for socket event handlers
   useEffect(() => { selectedChatRef.current = selectedChat; }, [selectedChat]);
+
+  // ========== HIDE NAVBAR ON MOBILE WHEN IN CHAT ==========
+  useEffect(() => {
+    if (selectedChat) {
+      document.body.classList.add("chat-open");
+    } else {
+      document.body.classList.remove("chat-open");
+    }
+    return () => document.body.classList.remove("chat-open");
+  }, [selectedChat]);
 
   // ========== AUTO-SCROLL ==========
   useEffect(() => {
@@ -177,15 +188,24 @@ export default function MessagesClient({ currentUser }) {
   }, [socket]);
 
   // ========== URL-BASED CHAT SELECTION ==========
+  // Reset guard when the target user changes
   useEffect(() => {
-    if (!initialUserId || isLoadingChats) return;
+    initialSelectionDone.current = false;
+  }, [initialUserId]);
+
+  useEffect(() => {
+    if (!initialUserId || isLoadingChats || initialSelectionDone.current) return;
 
     const init = async () => {
+      // Try to find in already-loaded conversations
       const existing = conversations.find((c) => c.otherUserId === initialUserId);
       if (existing) {
-        handleSelectConversation(existing);
+        initialSelectionDone.current = true;
+        await handleSelectConversation(existing);
         return;
       }
+
+      // Not in sidebar yet — create / fetch the chat
       const chatRes = await getOrCreateChat(initialUserId);
       if (!chatRes.chatId) return;
 
@@ -206,11 +226,12 @@ export default function MessagesClient({ currentUser }) {
         if (prev.some((c) => c.otherUserId === initialUserId)) return prev;
         return [newConv, ...prev];
       });
-      handleSelectConversation(newConv);
+      initialSelectionDone.current = true;
+      await handleSelectConversation(newConv);
     };
 
     init();
-  }, [initialUserId, isLoadingChats]);
+  }, [initialUserId, isLoadingChats, conversations]);
 
   // ========== SELECT CONVERSATION ==========
   const handleSelectConversation = async (conv) => {
@@ -234,19 +255,24 @@ export default function MessagesClient({ currentUser }) {
     url.searchParams.set("userId", conv.otherUserId);
     window.history.pushState({}, "", url);
 
-    // Fetch history
-    const res = await getMessages(conv.id);
-    if (res.messages) {
-      setMessages(res.messages.map((m) => ({ ...m, status: "sent" })));
+    try {
+      // Fetch history
+      const res = await getMessages(conv.id);
+      if (res.messages) {
+        setMessages(res.messages.map((m) => ({ ...m, status: "sent" })));
 
-      // Mark as read (cheap: 1 write)
-      const lastMsg = res.messages[res.messages.length - 1];
-      if (lastMsg) {
-        markChatAsRead(conv.id, lastMsg.id);
-        if (socket) socket.emit("mark_read", { chatId: conv.id });
+        // Mark as read (cheap: 1 write)
+        const lastMsg = res.messages[res.messages.length - 1];
+        if (lastMsg) {
+          markChatAsRead(conv.id, lastMsg.id);
+          if (socket) socket.emit("mark_read", { chatId: conv.id });
+        }
       }
+    } catch (err) {
+      console.error("Error loading messages:", err);
+    } finally {
+      setIsLoadingMessages(false);
     }
-    setIsLoadingMessages(false);
 
     // Clear unread in sidebar
     setConversations((prev) =>
@@ -482,7 +508,7 @@ export default function MessagesClient({ currentUser }) {
                 })
               ) : (
                 <div className={styles.emptyState}>
-                  <p>Say hello to {selectedChat.fullName}!</p>
+                  <p>Start a new conversation by sending a message to {selectedChat.fullName}!</p>
                 </div>
               )}
 

@@ -5,6 +5,10 @@
   color: var(--foreground);
 }
 
+:global(body.chat-open) .container {
+  height: 100vh;
+}
+
 @media (min-width: 640px) {
   .container {
     height: 100vh;

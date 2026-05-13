@@ -3,6 +3,7 @@
 import { db } from "../lib/firebase/firebase.admin";
 import { auth } from "../../auth";
 import { FieldValue } from "firebase-admin/firestore";
+import { createNotification } from "./notifications";
 
 // Consistent chat ID between two users
 const generateChatId = (uid1, uid2) => [uid1, uid2].sort().join("_");
@@ -151,6 +152,14 @@ export async function saveMessage(chatId, text, receiverId) {
     });
 
     await batch.commit();
+
+    // Trigger a real-time notification
+    await createNotification({
+      type: "message_received",
+      actor_id: myUid,
+      target_user_id: receiverId,
+      content: text,
+    });
 
     return {
       success: true,

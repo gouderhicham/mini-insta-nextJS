@@ -77,3 +77,17 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+/* ========== HIDE NAVBAR ON MOBILE WHEN CHAT IS OPEN ========== */
+@media (max-width: 639px) {
+  body.chat-open nav {
+    display: none !important;
+  }
+  /* Also hide the floating notification button */
+  body.chat-open [class*="notificationBtn"] {
+    display: none !important;
+  }
+  body.chat-open .mainContent {
+    padding-bottom: 0;
+  }
+}

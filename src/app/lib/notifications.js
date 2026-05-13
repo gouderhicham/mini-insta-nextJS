@@ -22,6 +22,9 @@ export function formatNotification(notification) {
     case "new_follow":
       text = "started following you";
       break;
+    case "message_received":
+      text = "sent you a message";
+      break;
     default:
       text = "performed an action";
   }

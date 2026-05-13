@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { searchUsers } from "../actions/users";
 import { db } from "../lib/firebase/firebase-client";
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
+import { formatNotification } from "../lib/notifications";
 import styles from "./Navbar.module.css";
 
 export default function Navbar({ session }) {
@@ -17,24 +19,56 @@ export default function Navbar({ session }) {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0); 
   const [toastMessage, setToastMessage] = useState(null);
+  const pathname = usePathname();
+  const pathnameRef = useRef(pathname);
+
+  useEffect(() => {
+    pathnameRef.current = pathname;
+  }, [pathname]);
 
   useEffect(() => {
     if (!session?.user?.id) return;
 
     // Listen to user document for real-time unread_notification_count changes
     const userRef = doc(db, "users", session.user.id);
-    const unsubscribe = onSnapshot(userRef, (docSnap) => {
+    let prevCountRef = undefined;
+
+    const unsubscribe = onSnapshot(userRef, async (docSnap) => {
       if (docSnap.exists()) {
         const newCount = docSnap.data().unread_notification_count || 0;
         
-        setUnreadCount((prevCount) => {
-          // If count increased, show a toast
-          if (newCount > prevCount && prevCount !== undefined) {
+        if (prevCountRef !== undefined && newCount > prevCountRef) {
+          // Count increased, fetch the latest notification
+          try {
+            const q = query(
+              collection(db, "notifications"),
+              where("target_user_id", "==", session.user.id),
+              orderBy("createdAt", "desc"),
+              limit(1)
+            );
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+              const latest = querySnapshot.docs[0].data();
+              if (latest.type === "message_received") {
+                if (!pathnameRef.current?.startsWith("/messages")) {
+                  setToastMessage(`You received a message from ${latest.actor_name}`);
+                }
+              } else {
+                const { fullText } = formatNotification(latest);
+                setToastMessage(fullText);
+              }
+            } else {
+              setToastMessage("You have a new notification");
+            }
+          } catch (err) {
+            console.error("Error fetching latest notification for toast:", err);
             setToastMessage("You have a new notification");
-            setTimeout(() => setToastMessage(null), 3000);
           }
-          return newCount;
-        });
+          setTimeout(() => setToastMessage(null), 3000);
+        }
+        
+        prevCountRef = newCount;
+        setUnreadCount(newCount);
       }
     });
 

@@ -35,6 +35,8 @@ export async function createNotification(data) {
       notification_url = `/post/${post_id}?commentId=${comment_id}`;
     } else if (type === "new_follow") {
       notification_url = `/profile/${actor_id}`; // Follow notification takes you to actor profile
+    } else if (type === "message_received") {
+      notification_url = `/messages?userId=${actor_id}`;
     }
 
     const notificationData = {
