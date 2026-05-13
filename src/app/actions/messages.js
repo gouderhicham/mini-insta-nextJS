@@ -88,7 +88,7 @@ export async function getOrCreateChat(otherUserId) {
   }
 }
 
-export async function getMessages(chatId) {
+export async function getMessages(chatId, { limit = 10, beforeTimestamp = null } = {}) {
   try {
     const session = await auth();
     if (!session?.user?.id) return { error: "Unauthorized" };
@@ -101,12 +101,17 @@ export async function getMessages(chatId) {
       return { error: "Chat not found or unauthorized" };
     }
 
-    // Paginated: latest 50 messages, descending then reverse
-    const snapshot = await chatRef
+    // Cursor-based pagination: fetch `limit + 1` to know if more exist
+    let q = chatRef
       .collection("messages")
-      .orderBy("createdAt", "desc")
-      .limit(50)
-      .get();
+      .orderBy("createdAt", "desc");
+
+    if (beforeTimestamp) {
+      const { Timestamp } = await import("firebase-admin/firestore");
+      q = q.where("createdAt", "<", Timestamp.fromMillis(beforeTimestamp));
+    }
+
+    const snapshot = await q.limit(limit + 1).get();
 
     const messages = [];
     snapshot.forEach((doc) => {
@@ -119,7 +124,10 @@ export async function getMessages(chatId) {
       });
     });
 
-    return { messages: messages.reverse() };
+    const hasMore = messages.length > limit;
+    if (hasMore) messages.pop(); // remove the extra probe message
+
+    return { messages: messages.reverse(), hasMore };
   } catch (error) {
     console.error("Error fetching messages:", error);
     return { error: "Failed to fetch messages" };

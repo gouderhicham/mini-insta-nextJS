@@ -27,8 +27,12 @@ export default function MessagesClient({ currentUser }) {
   const [newMessage, setNewMessage] = useState("");
   const [isLoadingChats, setIsLoadingChats] = useState(true);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoadingOlder, setIsLoadingOlder] = useState(false);
 
   const messagesEndRef = useRef(null);
+  const messagesListRef = useRef(null);
+  const shouldScrollToBottom = useRef(true);
   const currentRoomRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const isTypingRef = useRef(false);
@@ -48,9 +52,11 @@ export default function MessagesClient({ currentUser }) {
     return () => document.body.classList.remove("chat-open");
   }, [selectedChat]);
 
-  // ========== AUTO-SCROLL ==========
+  // ========== AUTO-SCROLL (only for new messages, not older prepends) ==========
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (shouldScrollToBottom.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   // ========== LOAD INBOX ==========
@@ -142,6 +148,7 @@ export default function MessagesClient({ currentUser }) {
 
       // Dedup: ignore if we already have this message ID
       if (current && data.chatId === current.id) {
+        shouldScrollToBottom.current = true;
         setMessages((prev) => {
           if (prev.some((m) => m.id === data.id)) return prev;
           return [...prev, { ...data, status: "sent" }];
@@ -256,10 +263,12 @@ export default function MessagesClient({ currentUser }) {
     window.history.pushState({}, "", url);
 
     try {
-      // Fetch history
+      // Fetch history (latest 10)
+      shouldScrollToBottom.current = true;
       const res = await getMessages(conv.id);
       if (res.messages) {
         setMessages(res.messages.map((m) => ({ ...m, status: "sent" })));
+        setHasMore(res.hasMore || false);
 
         // Mark as read (cheap: 1 write)
         const lastMsg = res.messages[res.messages.length - 1];
@@ -279,6 +288,55 @@ export default function MessagesClient({ currentUser }) {
       prev.map((c) => (c.id === conv.id ? { ...c, unreadCount: 0 } : c))
     );
   };
+
+  // ========== LOAD OLDER MESSAGES (infinite scroll) ==========
+  const loadOlderMessages = useCallback(async () => {
+    if (!selectedChat || isLoadingOlder || !hasMore) return;
+
+    const oldestMessage = messages[0];
+    if (!oldestMessage) return;
+
+    setIsLoadingOlder(true);
+    shouldScrollToBottom.current = false;
+
+    // Save scroll position so we can restore it after prepend
+    const listEl = messagesListRef.current;
+    const prevScrollHeight = listEl?.scrollHeight || 0;
+
+    try {
+      const res = await getMessages(selectedChat.id, {
+        beforeTimestamp: oldestMessage.createdAt,
+      });
+      if (res.messages && res.messages.length > 0) {
+        setMessages((prev) => [
+          ...res.messages.map((m) => ({ ...m, status: "sent" })),
+          ...prev,
+        ]);
+        setHasMore(res.hasMore || false);
+
+        // Restore scroll position after React renders the prepended messages
+        requestAnimationFrame(() => {
+          if (listEl) {
+            listEl.scrollTop = listEl.scrollHeight - prevScrollHeight;
+          }
+        });
+      } else {
+        setHasMore(false);
+      }
+    } catch (err) {
+      console.error("Error loading older messages:", err);
+    } finally {
+      setIsLoadingOlder(false);
+    }
+  }, [selectedChat, isLoadingOlder, hasMore, messages]);
+
+  const handleMessagesScroll = useCallback((e) => {
+    const el = e.target;
+    // Trigger load when scrolled near the top (within 50px)
+    if (el.scrollTop < 50 && hasMore && !isLoadingOlder) {
+      loadOlderMessages();
+    }
+  }, [hasMore, isLoadingOlder, loadOlderMessages]);
 
   // ========== BACK TO LIST ==========
   const handleBackToList = () => {
@@ -331,6 +389,7 @@ export default function MessagesClient({ currentUser }) {
     const now = Date.now();
 
     // 1. Optimistic UI — status: sending
+    shouldScrollToBottom.current = true;
     setMessages((prev) => [...prev, { id: tempId, text: messageText, senderId: currentUser.id, createdAt: now, status: "sending" }]);
     setNewMessage("");
     setConversations((prev) =>
@@ -469,7 +528,10 @@ export default function MessagesClient({ currentUser }) {
             </div>
 
             {/* Messages */}
-            <div className={styles.messagesList}>
+            <div className={styles.messagesList} ref={messagesListRef} onScroll={handleMessagesScroll}>
+              {isLoadingOlder && (
+                <div className={styles.loadingOlder}>Loading older messages...</div>
+              )}
               {isLoadingMessages ? (
                 <>
                   <div className={`${styles.messageWrapper} ${styles.messageReceived}`}>
