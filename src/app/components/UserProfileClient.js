@@ -254,12 +254,11 @@ export default function UserProfileClient({
                   >
                     {isFollowing ? "Following" : "Follow"}
                   </button>
-                  <a
-                    href={`/messages?userId=${userProfile.id}`}
+                  <button
                     className={`${styles.button} ${styles.buttonSecondary}`}
                   >
-                    Message
-                  </a>
+                    <a href={`/messages?userId=${userProfile.id}`}>Message</a>
+                  </button>
                 </>
               )}
             </div>

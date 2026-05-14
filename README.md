@@ -9,13 +9,14 @@ A modern, high-performance social media web application built with **Next.js 15*
 ## ✨ Key Features
 
 - **🔐 Robust Authentication**: Secure login and signup with NextAuth, including Google OAuth and Email/Password credentials.
-- **📝 Content Sharing**: Create posts with image uploads (via ImgBB) and text content.
-- **❤️ Real-time Interactions**: Like and comment on posts with optimistic UI updates for a snappy feel.
-- **🔔 Notification System**: Real-time Firebase-powered notifications for likes, comments, and new followers.
-- **👤 User Profiles**: Personalized profile pages with bio, profile pictures, and post history.
-- **🤝 Social Graph**: Follow/unfollow system with real-time count updates.
-- **🔍 User Search**: Quickly find and connect with other users.
-- **⚡ Performance Optimized**: Server-side rendering (SSR), dynamic metadata for SEO, and React caching for efficient data fetching.
+- **💬 Real-Time Messaging**: Instant private messaging powered by **Socket.io**, featuring typing indicators, read receipts, and persistent chat history.
+- **🔔 Live Notifications**: Dynamic notification system for likes, comments, follows, and new messages, with instant real-time delivery.
+- **❤️ Interactive Social Feed**: Like and comment on posts with optimistic UI updates for a high-performance, snappy experience.
+- **📝 Multimedia Content**: Create and share posts with text and image uploads (via ImgBB).
+- **👤 Personalized Profiles**: Detailed profile pages with bios, profile pictures, and post history.
+- **🤝 Social Graph**: Follow/unfollow system with real-time relationship tracking.
+- **🔍 Advanced Search**: Fast and efficient user discovery system.
+- **⚡ Technical Excellence**: Built with Next.js 15 (App Router), leveraging SSR, React Server Components, and optimized caching for superior SEO and performance.
 
 ---
 
@@ -23,9 +24,10 @@ A modern, high-performance social media web application built with **Next.js 15*
 
 - **Framework**: [Next.js 15 (App Router)](https://nextjs.org/)
 - **Styling**: [Vanilla CSS Modules](https://nextjs.org/docs/app/building-your-application/styling/css-modules) (Premium aesthetics)
-- **Database & Auth**: [Firebase](https://firebase.google.com/) (Firestore & Admin SDK)
+- **Database**: [Cloud Firestore](https://firebase.google.com/docs/firestore)
+- **Real-time**: [Socket.io](https://socket.io/) (Dedicated Node.js backend)
 - **Authentication**: [NextAuth.js v5](https://authjs.dev/)
-- **State Management**: [Zustand](https://docs.pmnd.rs/zustand/getting-started/introduction)
+- **State Management**: [Zustand](https://docs.pmnt.rs/zustand/getting-started/introduction)
 - **Fonts**: [Geist](https://vercel.com/font)
 
 ---
@@ -44,7 +46,9 @@ npm install
 ```
 
 ### 3. Environment Variables
-Create a `.env.local` file in the root directory and add your credentials:
+
+#### Frontend (.env.local)
+Create a `.env.local` file in the root directory:
 
 ```env
 # Firebase Client
@@ -54,6 +58,7 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
 
 # Firebase Admin
 FIREBASE_ADMIN_PROJECT_ID=your_project_id
@@ -65,10 +70,30 @@ AUTH_SECRET=your_auth_secret
 
 # ImgBB (For image uploads)
 NEXT_PUBLIC_IMGBB_API_KEY=your_imgbb_key
+
+# Socket.io (Backend URL)
+NEXT_PUBLIC_SOCKET_URL=http://localhost:3001
 ```
 
-### 4. Run the development server
+#### Backend (backend/.env)
+Create a `.env` file in the `backend` directory:
+
+```env
+PORT=3001
+FRONTEND_URL=your_frontend_url
+```
+
+### 4. Run the application
+
+#### Start Backend
 ```bash
+cd backend
+npm run dev
+```
+
+#### Start Frontend
+```bash
+# In the root directory
 npm run dev
 ```
 
@@ -89,7 +114,7 @@ Mini Instagram focuses on **Premium Visual Excellence**:
 ## 👤 Author
 
 **Gouder Hicham**
-- Website: [https://mini-insta-next-js.vercel.app/](https://mini-insta-next-js.vercel.app/)
+- Website: [https://mininsta-gh.vercel.app/](https://mininsta-gh.vercel.app/)
 - Project: Mini Instagram Clone
 
 ---

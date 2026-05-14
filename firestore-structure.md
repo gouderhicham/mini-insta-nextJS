@@ -112,4 +112,26 @@ Stores the actual messages. Kept as a subcollection to isolate data and keep que
 | `text` | string | The message content. |
 | `createdAt` | timestamp | Time the message was sent (for ordering). |
 
-*Note: No per-message `read` field. Read status is tracked via `lastReadMessageId` on the parent chat doc — this is 1 write instead of N writes when marking messages as read.*
+*Note: No per-message `read` field. Read status is tracked via `lastReadMessageId` on the parent chat doc — this is 1 write instead of N writes when marking messages as read.*
+
+---
+
+## 9. Root Collection: `notifications`
+Stores real-time alerts for user interactions (likes, comments, follows, and messages).
+- **Path:** `/notifications/{notificationId}`
+- **ID:** Auto-generated.
+
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `target_user_id` | string | UID of the user who receives the notification. |
+| `actor_id` | string | UID of the user who triggered the action. |
+| `actor_name` | string | Denormalized: Triggering user's full name. |
+| `actor_username`| string | Denormalized: Triggering user's username. |
+| `actor_profile_pic`| string | Denormalized: Triggering user's profile picture URL. |
+| `type` | string | Event type: `like`, `comment`, `follow`, `message_received`. |
+| `content` | string | Preview text (e.g., the comment text or message snippet). |
+| `post_id` | string | ID of the post (if applicable). |
+| `comment_id` | string | ID of the comment (if applicable). |
+| `notification_url`| string | Navigation link (e.g., `/messages?userId=tqTToXsP...`). |
+| `isRead` | boolean | Tracks if the user has viewed the notification. |
+| `createdAt` | timestamp | Time of the event. |
